@@ -388,6 +388,18 @@ select:focus {
   display: none !important;
 }
 
+.red-bcg {
+  background-color: red;
+}
+
+.red-text {
+  color: red;
+}
+
+.green-text {
+  color: green;
+}
+
 /* Адаптивность */
 @media (max-width: 600px) {
   .calculator-card {
