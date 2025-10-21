@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор скидок</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="calculator-card">
+        <div class="header">
+          <h1>🎁 Калькулятор скидок</h1>
+          <p class="subtitle">Рассчитайте итоговую стоимость с учетом всех скидок</p>
+        </div>
+
+        <!-- Основная информация о заказе -->
+        <div class="order-section">
+          <h2>Информация о заказе</h2>
+
+          <!-- Исходная цена -->
+          <div class="input-group">
+            <label for="original-price">Стоимость товара (₽):</label>
+            <input type="number" id="original-price" placeholder="Например: 5000" min="0" step="1" />
+          </div>
+
+          <!-- Количество товаров -->
+          <div class="input-group">
+            <label for="quantity">Количество:</label>
+            <div class="quantity-controls">
+              <button type="button" id="decrease-btn" class="quantity-btn">−</button>
+              <input type="number" id="quantity" value="1" min="1" max="100" readonly />
+              <button type="button" id="increase-btn" class="quantity-btn">+</button>
+            </div>
+          </div>
+
+          <!-- Процентная скидка -->
+          <div class="input-group">
+            <label for="discount-percent">Скидка на товар (%):</label>
+            <select id="discount-percent">
+              <option value="0">Без скидки</option>
+              <option value="5">5% (сезонная распродажа)</option>
+              <option value="10">10% (Black Friday)</option>
+              <option value="15">15% (День рождения магазина)</option>
+              <option value="20">20% (Новогодняя акция)</option>
+              <option value="30">30% (Ликвидация остатков)</option>
+              <option value="50">50% (Уценка)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Промокод -->
+        <div class="promo-section">
+          <h2>Промокод</h2>
+          <div class="promo-input-wrapper">
+            <input type="text" id="promo-code" placeholder="Введите промокод" maxlength="20" />
+            <button type="button" id="apply-promo-btn" class="btn-promo">Применить</button>
+          </div>
+          <div id="promo-message" class="promo-message hidden"></div>
+
+          <!-- Список доступных промокодов (для обучения) -->
+          <div class="promo-hints">
+            <p class="hint-title">💡 Доступные промокоды для теста:</p>
+            <ul class="promo-list">
+              <li><code>WELCOME2024</code> — скидка 500₽ для новых клиентов</li>
+              <li><code>SAVE10</code> — дополнительная скидка 10%</li>
+              <li><code>FREESHIP</code> — бесплатная доставка</li>
+              <li><code>VIP20</code> — скидка 20% для VIP клиентов</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Программа лояльности -->
+        <div class="loyalty-section">
+          <h2>Программа лояльности</h2>
+          <div class="input-group">
+            <label for="loyalty-level">Ваш статус:</label>
+            <select id="loyalty-level">
+              <option value="none">Нет карты лояльности</option>
+              <option value="bronze">🥉 Бронза (3% кэшбэк)</option>
+              <option value="silver">🥈 Серебро (5% кэшбэк + доп. скидка 2%)</option>
+              <option value="gold">🥇 Золото (7% кэшбэк + доп. скидка 5%)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Кнопка расчета -->
+        <button id="calculate-btn" class="btn-calculate">Рассчитать итоговую стоимость</button>
+
+        <!-- Результат -->
+        <div id="result" class="result-section hidden">
+          <h2>📊 Детализация расчета</h2>
+
+          <div class="calc-breakdown">
+            <!-- Исходная сумма -->
+            <div class="calc-row">
+              <span>Стоимость товара:</span>
+              <span id="base-total">0 ₽</span>
+            </div>
+
+            <!-- Скидка на товар -->
+            <div class="calc-row discount-row" id="product-discount-row" style="display: none">
+              <span>Скидка на товар (<span id="discount-percent-text">0</span>%):</span>
+              <span class="discount-value">−<span id="product-discount-value">0</span> ₽</span>
+            </div>
+
+            <!-- Промокод -->
+            <div class="calc-row discount-row" id="promo-discount-row" style="display: none">
+              <span>Промокод (<span id="promo-code-text">—</span>):</span>
+              <span class="discount-value">−<span id="promo-discount-value">0</span> ₽</span>
+            </div>
+
+            <!-- Лояльность -->
+            <div class="calc-row discount-row" id="loyalty-discount-row" style="display: none">
+              <span>Доп. скидка по карте (<span id="loyalty-discount-text">0</span>%):</span>
+              <span class="discount-value">−<span id="loyalty-discount-value">0</span> ₽</span>
+            </div>
+
+            <!-- Общая экономия -->
+            <div class="calc-row total-savings">
+              <span>💰 Общая экономия:</span>
+              <span id="total-savings">0 ₽</span>
+            </div>
+
+            <!-- Итоговая цена -->
+            <div class="calc-row final-price">
+              <span>К оплате:</span>
+              <span id="final-price">0 ₽</span>
+            </div>
+
+            <!-- Кэшбэк -->
+            <div class="calc-row cashback-row" id="cashback-row" style="display: none">
+              <span>🎁 Начислим кэшбэк:</span>
+              <span class="cashback-value">+<span id="cashback-value">0</span> ₽</span>
+            </div>
+
+            <!-- Бесплатная доставка -->
+            <div class="free-shipping" id="free-shipping-badge" style="display: none">
+              <span>✅ Бесплатная доставка</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Блок ошибки -->
+        <div id="error" class="error-message hidden"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
