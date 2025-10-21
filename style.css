@@ -392,11 +392,11 @@ select:focus {
   background-color: red;
 }
 
-.red-text {
+.error {
   color: red;
 }
 
-.green-text {
+.success {
   color: green;
 }
 

@@ -73,11 +73,7 @@ function applyPromoCode() {
   let parsedPromoCode = promoCode.value.trim().toUpperCase();
 
   if (!parsedPromoCode) {
-    promoMessage.classList.remove("hidden");
-    promoMessage.textContent = "";
-    const promoMessageError = document.createElement("p");
-    promoMessageError.textContent = "Введите промокод";
-    promoMessage.appendChild(promoMessageError);
+    showPromoMessage("Введите промокод");
     return;
   } else {
     promoMessage.classList.add("hidden");
@@ -88,23 +84,13 @@ function applyPromoCode() {
 
   if (currPromoCode) {
     applyedPromoCode = parsedPromoCode;
-    promoMessage.classList.remove("hidden");
-    promoMessage.textContent = "";
-    const promoMessageApply = document.createElement("p");
-    promoMessageApply.textContent = "Промокод применен";
-    promoMessageApply.classList.add("green-text");
-    promoMessage.appendChild(promoMessageApply);
+    showPromoMessage("Промокод применен", "success");
     promoCode.disabled = true; //новое
     applyPromoBtn.textContent = "Отменить";
     applyPromoBtn.classList.add("red-bcg");
   } else {
-    promoMessage.classList.remove("hidden");
-    promoMessage.textContent = "";
-    const promoMessageIncorrect = document.createElement("p");
-    promoMessageIncorrect.textContent = "Промокод не найден";
-    promoMessage.appendChild(promoMessageIncorrect);
-    promoMessageIncorrect.classList.add("red-text");
     applyedPromoCode = null;
+    showPromoMessage("Промокод не найден", "error");
   }
 }
 
@@ -118,9 +104,12 @@ function resetPromoCode() {
 }
 
 function showPromoMessage(message, type) {
-  // - Установи текст сообщения
-  // - Добавь нужный класс ('success' или 'error')
-  // - Убери класс 'hidden' чтобы показать сообщение
+  promoMessage.classList.remove("hidden");
+  promoMessage.textContent = "";
+  const promoMessageCurr = document.createElement("p");
+  promoMessageCurr.textContent = message;
+  promoMessageCurr.classList.add(type);
+  promoMessage.appendChild(promoMessageCurr);
 }
 
 applyPromoBtn.addEventListener("click", () => {
