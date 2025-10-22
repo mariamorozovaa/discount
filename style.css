@@ -388,16 +388,11 @@ select:focus {
   display: none !important;
 }
 
+/* Красная кнопка промокоды "Отменить" */
+
 .red-bcg {
-  background-color: red;
-}
-
-.error {
-  color: red;
-}
-
-.success {
-  color: green;
+  background: #f8d7da;
+  color: #721c24;
 }
 
 /* Адаптивность */

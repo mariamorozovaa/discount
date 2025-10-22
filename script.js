@@ -15,7 +15,7 @@ const loyaltyLevel = document.querySelector("#loyalty-level");
 const calculateBtn = document.querySelector("#calculate-btn");
 
 const result = document.querySelector("#result");
-const baseTotal = document.querySelector("#base-total");
+const baseTotalNode = document.querySelector("#base-total");
 const productDiscountValue = document.querySelector("#product-discount-value"); //- Скидка на товар (строка `product-discount-row`, значения `discount-percent-text`, `product-discount-value`)
 const promoDiscountValue = document.querySelector("#promo-discount-value"); //- Промокод (строка `promo-discount-row`, значения `promo-code-text`, `promo-discount-value`)
 const loyaltyDiscountValue = document.querySelector("#loyalty-discount-value"); //- Скидка лояльности (строка `loyalty-discount-row`, значения `loyalty-discount-text`, `loyalty-discount-value`)
@@ -25,16 +25,6 @@ const cashbackValue = document.querySelector("#cashback-value"); //- Кэшбэ�
 const freeShippingBadge = document.querySelector("#free-shipping-badge");
 
 const errors = document.querySelector("#error");
-
-const DISCOUNT_PERCENTS = {
-  none: { discount: 0, description: "Без скидки" },
-  season: { discount: 5, description: "Сезонная распродажа" },
-  blackFriday: { discount: 10, description: "Black Friday" },
-  bithdayStore: { discount: 15, description: "День рождения магазина" },
-  newYear: { discount: 20, description: "Новогодняя акция" },
-  liquidation: { discount: 30, description: "Ликвидация остатков" },
-  markdown: { discount: 50, description: "Уценка" },
-};
 
 const PROMO_CODES = {
   WELCOME2024: { type: "fixed", value: 500, description: "Скидка 500₽ для новых клиентов" },
@@ -67,13 +57,13 @@ function decreaceQuantity() {
 increaseBtn.addEventListener("click", increaceQuantity);
 decreaseBtn.addEventListener("click", decreaceQuantity);
 
-let applyedPromoCode = null;
+let appliedPromoCode = null;
 
 function applyPromoCode() {
   let parsedPromoCode = promoCode.value.trim().toUpperCase();
 
   if (!parsedPromoCode) {
-    showPromoMessage("Введите промокод");
+    showPromoMessage("Введите промокод", "error");
     return;
   } else {
     promoMessage.classList.add("hidden");
@@ -83,19 +73,19 @@ function applyPromoCode() {
   const currPromoCode = PROMO_CODES[parsedPromoCode]; //новое
 
   if (currPromoCode) {
-    applyedPromoCode = parsedPromoCode;
+    appliedPromoCode = parsedPromoCode;
     showPromoMessage("Промокод применен", "success");
     promoCode.disabled = true; //новое
     applyPromoBtn.textContent = "Отменить";
     applyPromoBtn.classList.add("red-bcg");
   } else {
-    applyedPromoCode = null;
+    appliedPromoCode = null;
     showPromoMessage("Промокод не найден", "error");
   }
 }
 
 function resetPromoCode() {
-  applyedPromoCode = null;
+  appliedPromoCode = null;
   promoCode.value = "";
   promoCode.disabled = false;
   promoMessage.classList.add("hidden");
@@ -104,12 +94,10 @@ function resetPromoCode() {
 }
 
 function showPromoMessage(message, type) {
-  promoMessage.classList.remove("hidden");
+  promoMessage.classList.remove("hidden", "success", "error");
   promoMessage.textContent = "";
-  const promoMessageCurr = document.createElement("p");
-  promoMessageCurr.textContent = message;
-  promoMessageCurr.classList.add(type);
-  promoMessage.appendChild(promoMessageCurr);
+  promoMessage.textContent = message;
+  promoMessage.classList.add(type);
 }
 
 applyPromoBtn.addEventListener("click", () => {
@@ -117,3 +105,78 @@ applyPromoBtn.addEventListener("click", () => {
     applyPromoCode();
   } else resetPromoCode();
 });
+
+const priceCurr = parseFloat(originalPrice.value);
+const quantityCurr = parseInt(quantity.value);
+const currDiscountPercent = parseInt(discountPercent.value);
+// const currTextOption = discountPercent.options[discountPercent.selectedIndex].text;
+const currLoyaltyLevel = loyaltyLevel.value;
+
+function validateInputs(price, quantity) {
+  if (isNaN(price)) {
+    return "Введите стоимость товара";
+  } else if (price <= 0) {
+    return "Стоимость должна быть больше нуля";
+  } else if (price > 1000000) {
+    return "Максимальная стоимость товара: 1 000 000 ₽";
+  } else if (quantity < 1 || quantity > 100) {
+    return "Количество должно быть от 1 до 100";
+  } else {
+    return null;
+  }
+}
+
+calculateBtn.addEventListener("click", () => {
+  try {
+    calculateFinalPrice();
+  } catch (err) {
+    errors.textContent = err.message;
+  }
+});
+
+function calculateFinalPrice() {
+  const priceCurr = parseFloat(originalPrice.value);
+  const quantityCurr = parseInt(quantity.value);
+  const currDiscountPercent = parseInt(discountPercent.value);
+  // const currTextOption = discountPercent.options[discountPercent.selectedIndex].text;
+  const currLoyaltyLevel = loyaltyLevel.value;
+  const errorCurr = validateInputs(priceCurr, quantityCurr);
+  let hasFreeShipping = false;
+
+  if (errorCurr) {
+    errors.textContent = errorCurr;
+    errors.classList.remove("hidden");
+    return;
+  } else {
+    errors.textContent = "";
+    errors.classList.add("hidden");
+  }
+
+  const baseTotal = priceCurr * quantityCurr;
+
+  result.classList.remove("hidden");
+  baseTotalNode.textContent = baseTotal + " ₽";
+
+  const afterDiscount = (baseTotal * currDiscountPercent) / 100;
+  let currentTotal = baseTotal - afterDiscount;
+
+  console.log(currentTotal);
+
+  if (appliedPromoCode !== null) {
+    if (PROMO_CODES[appliedPromoCode].type === "fixed") {
+      const min = Math.min(PROMO_CODES[appliedPromoCode].value, currentTotal);
+      if (min === PROMO_CODES[appliedPromoCode].value) {
+        const afterValuePromo = currentTotal - PROMO_CODES[appliedPromoCode].value;
+        console.log(afterValuePromo);
+      } else {
+        currentTotal = 0;
+        console.log(currentTotal);
+      }
+    } else if (PROMO_CODES[appliedPromoCode].type === "shipping") {
+      hasFreeShipping = true;
+    } else if (PROMO_CODES[appliedPromoCode].type === "percent") {
+      const afterPercentPromo = currentTotal - (currentTotal * PROMO_CODES[appliedPromoCode].value) / 100;
+      console.log(afterPercentPromo);
+    }
+  }
+}
